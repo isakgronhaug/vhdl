@@ -24,7 +24,45 @@ entity dice is
 end entity;
 
 architecture arch of dice is
-  -- signals etc
+  signal roll_s, fake_s : std_logic;
+  signal cnt, fusk : unsigned(3 downto 0);
 
-begin
+      type rom is array (0 to 6) of std_logic_vector(6 downto 0);
+  constant mem : rom := (
+    "1000000",
+    "1111001",
+    "0100100",
+    "0110000",
+    "0011001",
+    "0010010",
+    "0000010"
+  );
+
+  begin
+    process(clk, reset) begin
+      if reset = '1' then
+        roll_s <= '0';
+        fake_s <= '0';
+        cnt <= "0001";
+      elsif rising_edge(clk) then
+        roll_s <= roll;
+        fake_s <= fake;
+        
+        if (roll_s = '1') then 
+          if (fake_s = '1') and (cnt = 8) then
+            cnt <= "0001";
+          elsif (fake_s = '0') and (cnt >= 6) then
+            cnt <= "0001";
+          else 
+            cnt <= cnt + 1;
+          end if;
+        end if;
+      end if;
+    end process;
+
+fusk <= "0110" when cnt > 6 else cnt;
+seg <= mem(to_integer(fusk));
+dp <= '1';
+an <= "1110";
+
 end architecture;
