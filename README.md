@@ -9,6 +9,7 @@ Konstruktionerna är skrivna för ett **Basys3**-kort (Xilinx Artix-7) tillsamma
 |---|---|---|
 | 3.3 | `comb_lock.vhdl` | Kodlås (Moore-maskin) |
 | 3.4 | `timer.vhdl` | Nedräknande timer 8 → 0 med alarm och 7-segmentsdisplay |
+| 3.5 | `dice.vhdl` | Tärning 1–6 med valbart fuskläge |
 
 Till varje konstruktion hör en testbänk (`*_tb.vhdl`) och en constraint-fil (`*.xdc`) som kopplar portarna till kortets ben.
 
@@ -45,6 +46,23 @@ En tryckning på startknappen (T0) startar nedräkning från 8. Timern räknar n
 - **Display:** aktivt låg. Endast siffran längst till höger används (`an = "1110"`), och decimalpunkten är släckt
 
 **Klocka:** sclk ← 1 Hz
+
+---
+
+## 3.5 Tärning
+
+Medan knappen T0 (`roll`) hålls nere snurrar en räknare med 32 kHz. När knappen släpps stannar den på ett slumpmässigt värde mellan 1 och 6. Med S0 (`fake`) väljs vanlig eller fuskande tärning.
+
+**Konstruktion:**
+
+![Blockschema för tärningen](dice_blockschema.svg)
+
+- **Synkvippor** för `roll` och `fake`
+- **Räknare** (`unsigned`, 4 bitar) som räknar 1 → 6 när `fake = 0` och 1 → 8 när `fake = 1`, sedan tillbaka till 1. Reset sätter den till 1
+- **Fusklogik:** värdena 7 och 8 visas som 6, så att sexan får 3/8 mot 1/8 för övriga tal, alltså tre gånger så hög sannolikhet
+- **7-segmentsavkodare:** ROM-tabell indexerad med `to_integer(fusk)`
+
+**Klocka:** sclk ← 32 kHz
 
 ---
 
